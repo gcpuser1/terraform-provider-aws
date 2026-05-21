@@ -39,12 +39,16 @@ func TestAccSecretsManagerSecretVersion_basicString(t *testing.T) {
 				Config: testAccSecretVersionConfig_string(rName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckSecretVersionExists(ctx, t, resourceName, &version),
+					resource.TestCheckResourceAttrPair(resourceName, names.AttrARN, resourceName, "secret_arn"),
+					resource.TestCheckNoResourceAttr(resourceName, "has_secret_string_wo"),
+					resource.TestCheckResourceAttr(resourceName, "secret_binary", ""),
+					resource.TestCheckResourceAttrPair(resourceName, "secret_arn", secretResourceName, names.AttrARN),
+					resource.TestCheckResourceAttrPair(resourceName, "secret_id", secretResourceName, names.AttrID),
 					resource.TestCheckResourceAttr(resourceName, "secret_string", "test-string"),
+					resource.TestCheckNoResourceAttr(resourceName, "secret_string_wo_version"),
 					resource.TestCheckResourceAttrSet(resourceName, "version_id"),
 					resource.TestCheckResourceAttr(resourceName, "version_stages.#", "1"),
 					resource.TestCheckTypeSetElemAttr(resourceName, "version_stages.*", "AWSCURRENT"),
-					resource.TestCheckResourceAttrPair(resourceName, names.AttrARN, resourceName, "secret_arn"),
-					resource.TestCheckResourceAttrPair(resourceName, "secret_arn", secretResourceName, names.AttrARN),
 				),
 			},
 			{
